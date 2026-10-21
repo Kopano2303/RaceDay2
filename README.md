@@ -71,8 +71,4 @@ Example for SQL Server LocalDB:
 }
 ```
 
-Your connection string may need to be changed to match your SQL Server installation.
 
-Do not commit production passwords, private keys or other secrets to the repository.
-
-dotnet test RaceDay.sln
