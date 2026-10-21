@@ -26,9 +26,24 @@ namespace RaceDay.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Role>().HasData(
+         new Role
+        {
+        RoleID = 1,
+        RoleName = "Organiser",
+        Description = "Manages race events and participants."
+         },
+        new Role
+        {
+        RoleID = 2,
+        RoleName = "Participant",
+        Description = "Registers for race events and views results."
+         }
+            );
+
             modelBuilder.Entity<Category>()
-    .Property(c => c.DistanceKM)
-    .HasPrecision(10, 2);
+            .Property(c => c.DistanceKM)
+            .HasPrecision(10, 2);
 
             modelBuilder.Entity<EventCategory>()
                 .Property(ec => ec.EntryFee)

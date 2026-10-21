@@ -225,6 +225,20 @@ namespace RaceDay.Migrations
                     b.HasKey("RoleID");
 
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            RoleID = 1,
+                            Description = "Manages race events and participants.",
+                            RoleName = "Organiser"
+                        },
+                        new
+                        {
+                            RoleID = 2,
+                            Description = "Registers for race events and views results.",
+                            RoleName = "Participant"
+                        });
                 });
 
             modelBuilder.Entity("RaceDay.Models.Route", b =>
