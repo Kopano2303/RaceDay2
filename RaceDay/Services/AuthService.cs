@@ -17,7 +17,9 @@ namespace RaceDay.Services
         private readonly PasswordHasher<User> _passwordHasher;
         private readonly IConfiguration _configuration;
 
-        public AuthService(RaceDayContext context, IConfiguration configuration)
+        public AuthService(
+            RaceDayContext context,
+            IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
@@ -31,31 +33,31 @@ namespace RaceDay.Services
                 string.IsNullOrWhiteSpace(request.FirstName) ||
                 string.IsNullOrWhiteSpace(request.LastName))
             {
-                throw new ArgumentException("Email, password, first name and last name are required.");
+                throw new ArgumentException(
+                    "Email, password, first name and last name are required.");
+            }
+
+            if (request.Password.Length < 8)
+            {
+                throw new ArgumentException(
+                    "Password must contain at least 8 characters.");
             }
 
             string email = request.Email.Trim().ToLowerInvariant();
 
             if (await _context.Users.AnyAsync(u => u.Email == email))
             {
-                throw new ArgumentException("An account with this email already exists.");
-            }
-
-            string roleName = request.RoleName.Trim();
-
-            if (!roleName.Equals("Organiser", StringComparison.OrdinalIgnoreCase) &&
-                !roleName.Equals("Participant", StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ArgumentException("Role must be Organiser or Participant.");
+                throw new ArgumentException(
+                    "An account with this email already exists.");
             }
 
             Role? role = await _context.Roles
-                .FirstOrDefaultAsync(r => r.RoleName == roleName);
+                .FirstOrDefaultAsync(r => r.RoleName == "Participant");
 
             if (role == null)
             {
                 throw new InvalidOperationException(
-                    "The selected role is not configured in the database.");
+                    "The Participant role is not configured in the database.");
             }
 
             User user = new User
@@ -68,7 +70,8 @@ namespace RaceDay.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            user.PasswordHash = _passwordHasher.HashPassword(user, request.Password);
+            user.PasswordHash = _passwordHasher.HashPassword(
+                user, request.Password);
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -89,7 +92,8 @@ namespace RaceDay.Services
             if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password))
             {
-                throw new ArgumentException("Email and password are required.");
+                throw new ArgumentException(
+                    "Email and password are required.");
             }
 
             string email = request.Email.Trim().ToLowerInvariant();
@@ -100,48 +104,71 @@ namespace RaceDay.Services
 
             if (user == null)
             {
-                throw new UnauthorizedAccessException("Invalid email or password.");
+                throw new UnauthorizedAccessException(
+                    "Invalid email or password.");
             }
 
-            PasswordVerificationResult result = _passwordHasher.VerifyHashedPassword(
-                user,
-                user.PasswordHash,
-                request.Password);
+            PasswordVerificationResult result =
+                _passwordHasher.VerifyHashedPassword(
+                    user,
+                    user.PasswordHash,
+                    request.Password);
 
             if (result == PasswordVerificationResult.Failed)
             {
-                throw new UnauthorizedAccessException("Invalid email or password.");
+                throw new UnauthorizedAccessException(
+                    "Invalid email or password.");
             }
 
             string roleName = user.Role?.RoleName
-                ?? throw new InvalidOperationException("User role was not found.");
+                ?? throw new InvalidOperationException(
+                    "User role was not found.");
 
             string jwtKey = _configuration["Jwt:Key"]
-                ?? throw new InvalidOperationException("JWT key is missing from configuration.");
+                ?? throw new InvalidOperationException(
+                    "JWT key is missing from configuration.");
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
-                new Claim(ClaimTypes.Role, roleName)
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    user.UserID.ToString()),
+
+                new Claim(
+                    ClaimTypes.Email,
+                    user.Email),
+
+                new Claim(
+                    ClaimTypes.Name,
+                    user.FirstName + " " + user.LastName),
+
+                new Claim(
+                    ClaimTypes.Role,
+                    roleName)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtKey));
+
+            var credentials = new SigningCredentials(
+                key,
+                SecurityAlgorithms.HmacSha256);
+
+            DateTime expiry = DateTime.UtcNow.AddHours(2);
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: expiry,
                 signingCredentials: credentials);
 
-            string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            string tokenString =
+                new JwtSecurityTokenHandler().WriteToken(token);
 
             return new
             {
                 message = "Login successful.",
                 token = tokenString,
-                expiresAt = DateTime.UtcNow.AddHours(2),
+                expiresAt = expiry,
                 user.UserID,
                 user.Email,
                 user.FirstName,
@@ -151,3 +178,4 @@ namespace RaceDay.Services
         }
     }
 }
+

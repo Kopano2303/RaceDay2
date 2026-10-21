@@ -2,7 +2,8 @@
   "ExpandedNodes": [
     "",
     "\\RaceDay",
-    "\\RaceDay\\Controllers"
+    "\\RaceDay.Tests"
   ],
+  "SelectedNode": "\\RaceDay\\RaceDay.sln",
   "PreviewInSolutionExplorer": false
 }

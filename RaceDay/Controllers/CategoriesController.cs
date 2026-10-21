@@ -1,60 +1,112 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RaceDay.Data;
 using RaceDay.DTOs;
+using RaceDay.Models;
 
 namespace RaceDay.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetCategories()
+        private readonly RaceDayContext _context;
+
+        public CategoriesController(RaceDayContext context)
         {
-            return Ok(new
-            {
-                message = "Get all categories endpoint is working."
-            });
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _context.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.CategoryName)
+                .Select(c => new
+                {
+                    c.CategoryID,
+                    c.CategoryName,
+                    c.DistanceKM,
+                    c.CategoryType,
+                    c.Description
+                })
+                .ToListAsync();
+
+            return Ok(categories);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetCategory(int id)
+        public async Task<IActionResult> GetCategory(int id)
         {
-            return Ok(new
+            var category = await _context.Categories
+                .AsNoTracking()
+                .Where(c => c.CategoryID == id)
+                .Select(c => new
+                {
+                    c.CategoryID,
+                    c.CategoryName,
+                    c.DistanceKM,
+                    c.CategoryType,
+                    c.Description
+                })
+                .FirstOrDefaultAsync();
+
+            if (category == null)
             {
-                message = "Get category endpoint is working.",
-                categoryId = id
-            });
+                return NotFound(new { message = "Category not found." });
+            }
+
+            return Ok(category);
         }
 
+        [Authorize(Roles = "Organiser")]
         [HttpPost]
-        public IActionResult CreateCategory(CreateCategoryRequest request)
+        public async Task<IActionResult> CreateCategory(CreateCategoryRequest request)
         {
-            return Ok(new
+            if (string.IsNullOrWhiteSpace(request.CategoryName) ||
+                string.IsNullOrWhiteSpace(request.CategoryType) ||
+                request.DistanceKM <= 0)
             {
-                message = "Create category endpoint is working.",
-                data = request
-            });
-        }
+                return BadRequest(new
+                {
+                    message = "Category name and type are required, and distance must be greater than zero."
+                });
+            }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateCategory(int id, CreateCategoryRequest request)
-        {
-            return Ok(new
-            {
-                message = "Update category endpoint is working.",
-                categoryId = id,
-                data = request
-            });
-        }
+            bool exists = await _context.Categories.AnyAsync(c =>
+                c.CategoryName == request.CategoryName);
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteCategory(int id)
-        {
-            return Ok(new
+            if (exists)
             {
-                message = "Delete category endpoint is working.",
-                categoryId = id
-            });
+                return Conflict(new { message = "A category with this name already exists." });
+            }
+
+            var category = new Category
+            {
+                CategoryName = request.CategoryName.Trim(),
+                DistanceKM = request.DistanceKM,
+                CategoryType = request.CategoryType.Trim(),
+                Description = request.Description
+            };
+
+            _context.Categories.Add(category);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(GetCategory),
+                new { id = category.CategoryID },
+                new
+                {
+                    category.CategoryID,
+                    category.CategoryName,
+                    category.DistanceKM,
+                    category.CategoryType,
+                    category.Description
+                });
         }
     }
 }
