@@ -23,31 +23,64 @@ namespace RaceDay.Controllers
 
         private int GetLoggedInUserId()
         {
-            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
             return int.TryParse(userId, out int id) ? id : 0;
         }
 
         [Authorize(Roles = "Participant")]
         [HttpPost]
         public async Task<IActionResult> CreateEnrolment(
-            CreateEnrolmentRequest request)
+            [FromBody] CreateEnrolmentRequest request)
         {
             int userId = GetLoggedInUserId();
 
-            if (userId == 0)
-                return Unauthorized();
+            if (userId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
+            if (request.EventCategoryID <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A valid EventCategoryID is required."
+                });
+            }
 
             var eventCategory = await _context.EventCategories
                 .Include(ec => ec.Event)
+                .Include(ec => ec.Category)
                 .FirstOrDefaultAsync(ec =>
                     ec.EventCategoryID == request.EventCategoryID);
 
             if (eventCategory == null)
-                return BadRequest(new { message = "Event category not found." });
+            {
+                return NotFound(new
+                {
+                    message = "Event category not found."
+                });
+            }
 
-            if (eventCategory.Event == null ||
-                eventCategory.Event.EventDate < DateTime.Today)
-                return BadRequest(new { message = "This event is no longer available for enrolment." });
+            if (eventCategory.Event == null)
+            {
+                return BadRequest(new
+                {
+                    message = "The event associated with this category could not be found."
+                });
+            }
+
+            if (eventCategory.Event.EventDate.Date < DateTime.Today)
+            {
+                return BadRequest(new
+                {
+                    message = "This event is no longer available for enrolment."
+                });
+            }
 
             if (eventCategory.MaximumParticipants.HasValue)
             {
@@ -56,7 +89,12 @@ namespace RaceDay.Controllers
                     e.EnrolmentStatus != "Cancelled");
 
                 if (currentCount >= eventCategory.MaximumParticipants.Value)
-                    return Conflict(new { message = "This event category is full." });
+                {
+                    return Conflict(new
+                    {
+                        message = "This event category is full."
+                    });
+                }
             }
 
             bool alreadyEnrolled = await _context.Enrolments.AnyAsync(e =>
@@ -65,7 +103,12 @@ namespace RaceDay.Controllers
                 e.EnrolmentStatus != "Cancelled");
 
             if (alreadyEnrolled)
-                return Conflict(new { message = "You are already enrolled in this category." });
+            {
+                return Conflict(new
+                {
+                    message = "You are already enrolled in this category."
+                });
+            }
 
             var enrolment = new Enrolment
             {
@@ -78,12 +121,14 @@ namespace RaceDay.Controllers
             _context.Enrolments.Add(enrolment);
             await _context.SaveChangesAsync();
 
-            return Ok(new
+            return StatusCode(201, new
             {
                 message = "Enrolment created successfully.",
                 enrolment.EnrolmentID,
                 enrolment.UserID,
                 enrolment.EventCategoryID,
+                EventName = eventCategory.Event.EventName,
+                CategoryName = eventCategory.Category?.CategoryName,
                 enrolment.PaymentStatus,
                 enrolment.EnrolmentStatus
             });
@@ -95,9 +140,18 @@ namespace RaceDay.Controllers
         {
             int userId = GetLoggedInUserId();
 
+            if (userId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
             var enrolments = await _context.Enrolments
                 .AsNoTracking()
                 .Where(e => e.UserID == userId)
+                .OrderByDescending(e => e.EnrolmentID)
                 .Select(e => new
                 {
                     e.EnrolmentID,
@@ -113,21 +167,43 @@ namespace RaceDay.Controllers
         }
 
         [Authorize(Roles = "Organiser")]
-        [HttpGet("event/{eventId}")]
+        [HttpGet("event/{eventId:int}")]
         public async Task<IActionResult> GetEventEnrolments(int eventId)
         {
             int organiserId = GetLoggedInUserId();
+
+            if (organiserId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
+            if (eventId <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A valid event ID is required."
+                });
+            }
 
             bool ownsEvent = await _context.Events.AnyAsync(e =>
                 e.EventID == eventId &&
                 e.OrganiserID == organiserId);
 
             if (!ownsEvent)
-                return NotFound(new { message = "Event not found for this organiser." });
+            {
+                return NotFound(new
+                {
+                    message = "Event not found for this organiser."
+                });
+            }
 
             var enrolments = await _context.Enrolments
                 .AsNoTracking()
                 .Where(e => e.EventCategory!.EventID == eventId)
+                .OrderBy(e => e.EnrolmentID)
                 .Select(e => new
                 {
                     e.EnrolmentID,
@@ -144,3 +220,4 @@ namespace RaceDay.Controllers
         }
     }
 }
+

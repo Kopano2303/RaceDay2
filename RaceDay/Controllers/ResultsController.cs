@@ -23,47 +23,106 @@ namespace RaceDay.Controllers
 
         private int GetLoggedInUserId()
         {
-            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
             return int.TryParse(userId, out int id) ? id : 0;
         }
 
         [Authorize(Roles = "Organiser")]
         [HttpPost]
-        public async Task<IActionResult> CreateResult(CreateResultRequest request)
+        public async Task<IActionResult> CreateResult(
+            [FromBody] CreateResultRequest request)
         {
             int organiserId = GetLoggedInUserId();
 
-            if (organiserId == 0)
-                return Unauthorized();
+            if (organiserId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
+            if (request.EnrolmentID <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A valid EnrolmentID is required."
+                });
+            }
 
             if (string.IsNullOrWhiteSpace(request.Status))
-                return BadRequest(new { message = "Result status is required." });
+            {
+                return BadRequest(new
+                {
+                    message = "Result status is required."
+                });
+            }
 
             if (request.OverallPosition.HasValue &&
                 request.OverallPosition.Value < 1)
-                return BadRequest(new { message = "Overall position must be at least 1." });
+            {
+                return BadRequest(new
+                {
+                    message = "Overall position must be at least 1."
+                });
+            }
 
             if (request.CategoryPosition.HasValue &&
                 request.CategoryPosition.Value < 1)
-                return BadRequest(new { message = "Category position must be at least 1." });
+            {
+                return BadRequest(new
+                {
+                    message = "Category position must be at least 1."
+                });
+            }
+
+            if (request.FinishTime < TimeSpan.Zero)
+            {
+                return BadRequest(new
+                {
+                    message = "Finish time cannot be negative."
+                });
+            }
 
             var enrolment = await _context.Enrolments
                 .Include(e => e.EventCategory)
                     .ThenInclude(ec => ec!.Event)
-                .FirstOrDefaultAsync(e => e.EnrolmentID == request.EnrolmentID);
+                .FirstOrDefaultAsync(e =>
+                    e.EnrolmentID == request.EnrolmentID);
 
             if (enrolment == null)
-                return NotFound(new { message = "Enrolment not found." });
+            {
+                return NotFound(new
+                {
+                    message = "Enrolment not found."
+                });
+            }
 
-            if (enrolment.EventCategory?.Event == null ||
-                enrolment.EventCategory.Event.OrganiserID != organiserId)
+            if (enrolment.EventCategory?.Event == null)
+            {
+                return BadRequest(new
+                {
+                    message = "The event associated with this enrolment could not be found."
+                });
+            }
+
+            if (enrolment.EventCategory.Event.OrganiserID != organiserId)
+            {
                 return Forbid();
+            }
 
             bool resultExists = await _context.Results
                 .AnyAsync(r => r.EnrolmentID == request.EnrolmentID);
 
             if (resultExists)
-                return Conflict(new { message = "A result already exists for this enrolment." });
+            {
+                return Conflict(new
+                {
+                    message = "A result already exists for this enrolment."
+                });
+            }
 
             var result = new Result
             {
@@ -78,7 +137,7 @@ namespace RaceDay.Controllers
             _context.Results.Add(result);
             await _context.SaveChangesAsync();
 
-            return Ok(new
+            return StatusCode(201, new
             {
                 message = "Race result recorded successfully.",
                 result.ResultID,
@@ -97,12 +156,18 @@ namespace RaceDay.Controllers
         {
             int userId = GetLoggedInUserId();
 
-            if (userId == 0)
-                return Unauthorized();
+            if (userId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
 
             var results = await _context.Results
                 .AsNoTracking()
                 .Where(r => r.Enrolment!.UserID == userId)
+                .OrderBy(r => r.OverallPosition)
                 .Select(r => new
                 {
                     r.ResultID,
@@ -121,21 +186,43 @@ namespace RaceDay.Controllers
         }
 
         [Authorize(Roles = "Organiser")]
-        [HttpGet("event/{eventId}")]
+        [HttpGet("event/{eventId:int}")]
         public async Task<IActionResult> GetEventResults(int eventId)
         {
             int organiserId = GetLoggedInUserId();
+
+            if (organiserId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
+            if (eventId <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "A valid event ID is required."
+                });
+            }
 
             bool ownsEvent = await _context.Events.AnyAsync(e =>
                 e.EventID == eventId &&
                 e.OrganiserID == organiserId);
 
             if (!ownsEvent)
-                return NotFound(new { message = "Event not found for this organiser." });
+            {
+                return NotFound(new
+                {
+                    message = "Event not found for this organiser."
+                });
+            }
 
             var results = await _context.Results
                 .AsNoTracking()
                 .Where(r => r.Enrolment!.EventCategory!.EventID == eventId)
+                .OrderBy(r => r.OverallPosition)
                 .Select(r => new
                 {
                     r.ResultID,

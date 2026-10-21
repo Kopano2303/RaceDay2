@@ -23,9 +23,51 @@ namespace RaceDay.Controllers
 
         private int GetLoggedInUserId()
         {
-            string? userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
 
             return int.TryParse(userId, out int id) ? id : 0;
+        }
+
+        private static bool IsValidEventType(string eventType)
+        {
+            string[] allowedTypes = { "Run", "Walk", "Cycle" };
+
+            return allowedTypes.Contains(
+                eventType.Trim(),
+                StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static bool HasValidEventDetails(CreateEventRequest request)
+        {
+            return !string.IsNullOrWhiteSpace(request.EventName)
+                && !string.IsNullOrWhiteSpace(request.EventType)
+                && IsValidEventType(request.EventType)
+                && !string.IsNullOrWhiteSpace(request.Venue)
+                && !string.IsNullOrWhiteSpace(request.City)
+                && !string.IsNullOrWhiteSpace(request.Province)
+                && !string.IsNullOrWhiteSpace(request.Status)
+                && request.EventDate != default
+                && request.StartTime >= TimeSpan.Zero
+                && request.StartTime < TimeSpan.FromDays(1);
+        }
+
+        private static object EventResponse(RaceDay.Models.Event e)
+        {
+            return new
+            {
+                e.EventID,
+                e.OrganiserID,
+                e.EventName,
+                e.Description,
+                e.EventType,
+                e.EventDate,
+                e.StartTime,
+                e.Venue,
+                e.City,
+                e.Province,
+                e.Status
+            };
         }
 
         [HttpGet]
@@ -53,57 +95,44 @@ namespace RaceDay.Controllers
             return Ok(events);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetEvent(int id)
         {
             var eventItem = await _context.Events
                 .AsNoTracking()
-                .Where(e => e.EventID == id)
-                .Select(e => new
-                {
-                    e.EventID,
-                    e.OrganiserID,
-                    e.EventName,
-                    e.Description,
-                    e.EventType,
-                    e.EventDate,
-                    e.StartTime,
-                    e.Venue,
-                    e.City,
-                    e.Province,
-                    e.Status
-                })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(e => e.EventID == id);
 
             if (eventItem == null)
             {
-                return NotFound(new { message = "Event not found." });
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
             }
 
-            return Ok(eventItem);
+            return Ok(EventResponse(eventItem));
         }
 
         [Authorize(Roles = "Organiser")]
         [HttpPost]
-        public async Task<IActionResult> CreateEvent(CreateEventRequest request)
+        public async Task<IActionResult> CreateEvent(
+            [FromBody] CreateEventRequest request)
         {
             int organiserId = GetLoggedInUserId();
 
-            if (organiserId == 0)
+            if (organiserId <= 0)
             {
-                return Unauthorized();
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
             }
 
-            if (string.IsNullOrWhiteSpace(request.EventName) ||
-                string.IsNullOrWhiteSpace(request.EventType) ||
-                string.IsNullOrWhiteSpace(request.Venue) ||
-                string.IsNullOrWhiteSpace(request.City) ||
-                string.IsNullOrWhiteSpace(request.Province) ||
-                string.IsNullOrWhiteSpace(request.Status))
+            if (!HasValidEventDetails(request))
             {
                 return BadRequest(new
                 {
-                    message = "Event name, type, venue, city, province and status are required."
+                    message = "Provide a valid event name, event type (Run, Walk, or Cycle), venue, city, province, status, date, and start time."
                 });
             }
 
@@ -111,7 +140,9 @@ namespace RaceDay.Controllers
             {
                 OrganiserID = organiserId,
                 EventName = request.EventName.Trim(),
-                Description = request.Description,
+                Description = string.IsNullOrWhiteSpace(request.Description)
+                    ? null
+                    : request.Description.Trim(),
                 EventType = request.EventType.Trim(),
                 EventDate = request.EventDate,
                 StartTime = request.StartTime,
@@ -131,34 +162,35 @@ namespace RaceDay.Controllers
                 new
                 {
                     message = "Event created successfully.",
-                    eventItem.EventID,
-                    eventItem.OrganiserID,
-                    eventItem.EventName,
-                    eventItem.Description,
-                    eventItem.EventType,
-                    eventItem.EventDate,
-                    eventItem.StartTime,
-                    eventItem.Venue,
-                    eventItem.City,
-                    eventItem.Province,
-                    eventItem.Status
+                    data = EventResponse(eventItem)
                 });
         }
 
         [Authorize(Roles = "Organiser")]
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateEvent(
             int id,
-            CreateEventRequest request)
+            [FromBody] CreateEventRequest request)
         {
             int organiserId = GetLoggedInUserId();
+
+            if (organiserId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
 
             var eventItem = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventID == id);
 
             if (eventItem == null)
             {
-                return NotFound(new { message = "Event not found." });
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
             }
 
             if (eventItem.OrganiserID != organiserId)
@@ -166,21 +198,18 @@ namespace RaceDay.Controllers
                 return Forbid();
             }
 
-            if (string.IsNullOrWhiteSpace(request.EventName) ||
-                string.IsNullOrWhiteSpace(request.EventType) ||
-                string.IsNullOrWhiteSpace(request.Venue) ||
-                string.IsNullOrWhiteSpace(request.City) ||
-                string.IsNullOrWhiteSpace(request.Province) ||
-                string.IsNullOrWhiteSpace(request.Status))
+            if (!HasValidEventDetails(request))
             {
                 return BadRequest(new
                 {
-                    message = "Event name, type, venue, city, province and status are required."
+                    message = "Provide a valid event name, event type (Run, Walk, or Cycle), venue, city, province, status, date, and start time."
                 });
             }
 
             eventItem.EventName = request.EventName.Trim();
-            eventItem.Description = request.Description;
+            eventItem.Description = string.IsNullOrWhiteSpace(request.Description)
+                ? null
+                : request.Description.Trim();
             eventItem.EventType = request.EventType.Trim();
             eventItem.EventDate = request.EventDate;
             eventItem.StartTime = request.StartTime;
@@ -194,32 +223,33 @@ namespace RaceDay.Controllers
             return Ok(new
             {
                 message = "Event updated successfully.",
-                eventItem.EventID,
-                eventItem.OrganiserID,
-                eventItem.EventName,
-                eventItem.Description,
-                eventItem.EventType,
-                eventItem.EventDate,
-                eventItem.StartTime,
-                eventItem.Venue,
-                eventItem.City,
-                eventItem.Province,
-                eventItem.Status
+                data = EventResponse(eventItem)
             });
         }
 
         [Authorize(Roles = "Organiser")]
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
             int organiserId = GetLoggedInUserId();
+
+            if (organiserId <= 0)
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
 
             var eventItem = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventID == id);
 
             if (eventItem == null)
             {
-                return NotFound(new { message = "Event not found." });
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
             }
 
             if (eventItem.OrganiserID != organiserId)
@@ -227,10 +257,30 @@ namespace RaceDay.Controllers
                 return Forbid();
             }
 
+            bool hasEventCategories = await _context.EventCategories
+                .AnyAsync(ec => ec.EventID == id);
+
+            bool hasRoute = await _context.Routes
+                .AnyAsync(r => r.EventID == id);
+
+            bool hasWeatherRecords = await _context.WeatherRecords
+                .AnyAsync(w => w.EventID == id);
+
+            if (hasEventCategories || hasRoute || hasWeatherRecords)
+            {
+                return Conflict(new
+                {
+                    message = "This event has linked categories, route, or weather records. Preserve these records and update the event status instead of deleting it."
+                });
+            }
+
             _context.Events.Remove(eventItem);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Event deleted successfully." });
+            return Ok(new
+            {
+                message = "Event deleted successfully."
+            });
         }
     }
 }
