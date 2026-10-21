@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\RaceDay",
-    "\\RaceDay.Tests"
+    "\\RaceDay.Tests",
+    "\\RaceDay\\Controllers"
   ],
-  "SelectedNode": "\\RaceDay\\RaceDay.sln",
+  "SelectedNode": "\\RaceDay\\Controllers\\WeatherController.cs",
   "PreviewInSolutionExplorer": false
 }
