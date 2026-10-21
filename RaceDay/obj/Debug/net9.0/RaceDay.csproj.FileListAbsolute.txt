@@ -231,8 +231,6 @@ C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\RaceDay.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\RaceDay.pdb
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Azure.Core.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Azure.Identity.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\DM.DmProvider.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\DM.Microsoft.EntityFrameworkCore.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Humanizer.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Microsoft.Bcl.AsyncInterfaces.dll
@@ -287,10 +285,6 @@ C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\System.Secu
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\System.Security.Permissions.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\System.Text.Json.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\System.Windows.Extensions.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\en\DM.DmProvider.resources.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\zh-CN\DM.DmProvider.resources.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\zh-HK\DM.DmProvider.resources.dll
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\zh-TW\DM.DmProvider.resources.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\de\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\es\Microsoft.CodeAnalysis.resources.dll
@@ -385,10 +379,15 @@ C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebas
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebassets.development.json
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebassets.build.endpoints.json
-C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\RaceDay.csproj.Up2Date
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\RaceDay.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\refint\RaceDay.dll
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\RaceDay.pdb
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\RaceDay.genruntimeconfig.cache
 C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\ref\RaceDay.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\bin\Debug\net9.0\Microsoft.Bcl.Cryptography.dll
+C:\Users\Student\Documents\RaceDay\RaceDay2\RaceDay\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt

@@ -1,9 +1,13 @@
 ﻿
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RaceDay.Data;
 using RaceDay.DTOs;
 using RaceDay.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace RaceDay.Services
 {
@@ -11,10 +15,12 @@ namespace RaceDay.Services
     {
         private readonly RaceDayContext _context;
         private readonly PasswordHasher<User> _passwordHasher;
+        private readonly IConfiguration _configuration;
 
-        public AuthService(RaceDayContext context)
+        public AuthService(RaceDayContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
             _passwordHasher = new PasswordHasher<User>();
         }
 
@@ -49,7 +55,7 @@ namespace RaceDay.Services
             if (role == null)
             {
                 throw new InvalidOperationException(
-                    "The selected role is not configured in the database. Add the Organiser and Participant roles first.");
+                    "The selected role is not configured in the database.");
             }
 
             User user = new User
@@ -107,14 +113,40 @@ namespace RaceDay.Services
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
+            string roleName = user.Role?.RoleName
+                ?? throw new InvalidOperationException("User role was not found.");
+
+            string jwtKey = _configuration["Jwt:Key"]
+                ?? throw new InvalidOperationException("JWT key is missing from configuration.");
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
+                new Claim(ClaimTypes.Role, roleName)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(2),
+                signingCredentials: credentials);
+
+            string tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
             return new
             {
                 message = "Login successful.",
+                token = tokenString,
+                expiresAt = DateTime.UtcNow.AddHours(2),
                 user.UserID,
                 user.Email,
                 user.FirstName,
                 user.LastName,
-                role = user.Role?.RoleName
+                role = roleName
             };
         }
     }

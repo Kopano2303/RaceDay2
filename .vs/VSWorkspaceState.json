@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\RaceDay"
+    "\\RaceDay",
+    "\\RaceDay\\Controllers"
   ],
+  "SelectedNode": "\\RaceDay\\RaceDay.csproj",
   "PreviewInSolutionExplorer": false
 }
