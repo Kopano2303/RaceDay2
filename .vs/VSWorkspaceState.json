@@ -4,6 +4,6 @@
     "\\RaceDay",
     "\\RaceDay\\Controllers"
   ],
-  "SelectedNode": "\\RaceDay\\RaceDay.csproj",
+  "SelectedNode": "\\RaceDay\\Controllers\\UsersController.cs",
   "PreviewInSolutionExplorer": false
 }
