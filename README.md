@@ -75,11 +75,3 @@ Your connection string may need to be changed to match your SQL Server installat
 
 Do not commit production passwords, private keys or other secrets to the repository.
 
-## 7. Running the Project
-
-1. Clone or download the repository.
-2. Open `RaceDay.sln` in Visual Studio.
-3. Check the database connection string.
-4. Restore the NuGet packages.
-5. Apply the existing Entity Framework Core migrations if the database has not been created.
-6. Set the `RaceDay` project as the startup project
