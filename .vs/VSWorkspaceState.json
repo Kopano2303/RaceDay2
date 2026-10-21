@@ -3,8 +3,8 @@
     "",
     "\\RaceDay",
     "\\RaceDay.Tests",
-    "\\RaceDay\\Services"
+    "\\RaceDay\\Controllers"
   ],
-  "SelectedNode": "\\RaceDay\\Models",
+  "SelectedNode": "\\RaceDay.Tests\\AuthorizationIntegrationTests.cs",
   "PreviewInSolutionExplorer": false
 }
