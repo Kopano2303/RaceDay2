@@ -2,8 +2,9 @@
   "ExpandedNodes": [
     "",
     "\\RaceDay",
-    "\\RaceDay.Tests"
+    "\\RaceDay.Tests",
+    "\\RaceDay\\Data"
   ],
-  "SelectedNode": "\\RaceDay.Tests\\WeatherControllerTests.cs",
+  "SelectedNode": "\\.gitattributes",
   "PreviewInSolutionExplorer": false
 }
