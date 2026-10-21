@@ -39,7 +39,7 @@ namespace RaceDay.Controllers
             return Ok(categories);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetCategory(int id)
         {
             var category = await _context.Categories
@@ -57,7 +57,10 @@ namespace RaceDay.Controllers
 
             if (category == null)
             {
-                return NotFound(new { message = "Category not found." });
+                return NotFound(new
+                {
+                    message = "Category not found."
+                });
             }
 
             return Ok(category);
@@ -65,10 +68,14 @@ namespace RaceDay.Controllers
 
         [Authorize(Roles = "Organiser")]
         [HttpPost]
-        public async Task<IActionResult> CreateCategory(CreateCategoryRequest request)
+        public async Task<IActionResult> CreateCategory(
+            [FromBody] CreateCategoryRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.CategoryName) ||
-                string.IsNullOrWhiteSpace(request.CategoryType) ||
+            string categoryName = request.CategoryName?.Trim() ?? "";
+            string categoryType = request.CategoryType?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(categoryName) ||
+                string.IsNullOrWhiteSpace(categoryType) ||
                 request.DistanceKM <= 0)
             {
                 return BadRequest(new
@@ -77,20 +84,38 @@ namespace RaceDay.Controllers
                 });
             }
 
+            string[] allowedTypes = { "Run", "Walk", "Cycle" };
+
+            if (!allowedTypes.Contains(
+                categoryType,
+                StringComparer.OrdinalIgnoreCase))
+            {
+                return BadRequest(new
+                {
+                    message = "Category type must be Run, Walk, or Cycle."
+                });
+            }
+
             bool exists = await _context.Categories.AnyAsync(c =>
-                c.CategoryName == request.CategoryName);
+                c.CategoryName.ToLower() == categoryName.ToLower());
 
             if (exists)
             {
-                return Conflict(new { message = "A category with this name already exists." });
+                return Conflict(new
+                {
+                    message = "A category with this name already exists."
+                });
             }
 
             var category = new Category
             {
-                CategoryName = request.CategoryName.Trim(),
+                CategoryName = categoryName,
                 DistanceKM = request.DistanceKM,
-                CategoryType = request.CategoryType.Trim(),
-                Description = request.Description
+                CategoryType = allowedTypes.First(t =>
+                    t.Equals(categoryType, StringComparison.OrdinalIgnoreCase)),
+                Description = string.IsNullOrWhiteSpace(request.Description)
+                    ? null
+                    : request.Description.Trim()
             };
 
             _context.Categories.Add(category);

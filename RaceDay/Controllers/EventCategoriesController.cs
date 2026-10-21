@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using RaceDay.Data;
 using RaceDay.DTOs;
 using RaceDay.Models;
@@ -40,7 +41,7 @@ namespace RaceDay.Controllers
             return Ok(eventCategories);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetEventCategory(int id)
         {
             var eventCategory = await _context.EventCategories
@@ -60,7 +61,10 @@ namespace RaceDay.Controllers
 
             if (eventCategory == null)
             {
-                return NotFound(new { message = "Event category not found." });
+                return NotFound(new
+                {
+                    message = "Event category not found."
+                });
             }
 
             return Ok(eventCategory);
@@ -69,33 +73,13 @@ namespace RaceDay.Controllers
         [Authorize(Roles = "Organiser")]
         [HttpPost]
         public async Task<IActionResult> CreateEventCategory(
-            CreateEventCategoryRequest request)
+            [FromBody] CreateEventCategoryRequest request)
         {
-            bool eventExists = await _context.Events
-                .AnyAsync(e => e.EventID == request.EventID);
-
-            if (!eventExists)
+            if (request.EventID <= 0 || request.CategoryID <= 0)
             {
-                return BadRequest(new { message = "The specified event does not exist." });
-            }
-
-            bool categoryExists = await _context.Categories
-                .AnyAsync(c => c.CategoryID == request.CategoryID);
-
-            if (!categoryExists)
-            {
-                return BadRequest(new { message = "The specified category does not exist." });
-            }
-
-            bool alreadyLinked = await _context.EventCategories.AnyAsync(ec =>
-                ec.EventID == request.EventID &&
-                ec.CategoryID == request.CategoryID);
-
-            if (alreadyLinked)
-            {
-                return Conflict(new
+                return BadRequest(new
                 {
-                    message = "This category is already linked to the event."
+                    message = "Valid EventID and CategoryID are required."
                 });
             }
 
@@ -106,6 +90,57 @@ namespace RaceDay.Controllers
                 return BadRequest(new
                 {
                     message = "Entry fee cannot be negative, and maximum participants must be greater than zero."
+                });
+            }
+
+            var userIdValue = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (!int.TryParse(userIdValue, out int userId))
+            {
+                return Unauthorized(new
+                {
+                    message = "User identity could not be verified."
+                });
+            }
+
+            var eventItem = await _context.Events
+                .FirstOrDefaultAsync(e => e.EventID == request.EventID);
+
+            if (eventItem == null)
+            {
+                return NotFound(new
+                {
+                    message = "The specified event does not exist."
+                });
+            }
+
+            if (eventItem.OrganiserID != userId)
+            {
+                return Forbid();
+            }
+
+            bool categoryExists = await _context.Categories
+                .AnyAsync(c => c.CategoryID == request.CategoryID);
+
+            if (!categoryExists)
+            {
+                return BadRequest(new
+                {
+                    message = "The specified category does not exist."
+                });
+            }
+
+            bool alreadyLinked = await _context.EventCategories
+                .AnyAsync(ec =>
+                    ec.EventID == request.EventID &&
+                    ec.CategoryID == request.CategoryID);
+
+            if (alreadyLinked)
+            {
+                return Conflict(new
+                {
+                    message = "This category is already linked to the event."
                 });
             }
 

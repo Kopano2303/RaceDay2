@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "jX7BV003uWw=",
+  "dgSpecHash": "8/wLqpPKxZQ=",
   "success": true,
   "projectFilePath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay2\\RaceDay.Tests\\RaceDay.Tests.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore\\9.0.20\\microsoft.entityframeworkcore.9.0.20.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\9.0.20\\microsoft.entityframeworkcore.abstractions.9.0.20.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\9.0.20\\microsoft.entityframeworkcore.analyzers.9.0.20.nupkg.sha512",
+    "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore.inmemory\\9.0.20\\microsoft.entityframeworkcore.inmemory.9.0.20.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\9.0.20\\microsoft.entityframeworkcore.relational.9.0.20.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.entityframeworkcore.sqlserver\\9.0.20\\microsoft.entityframeworkcore.sqlserver.9.0.20.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\microsoft.extensions.apidescription.server\\9.0.0\\microsoft.extensions.apidescription.server.9.0.0.nupkg.sha512",
