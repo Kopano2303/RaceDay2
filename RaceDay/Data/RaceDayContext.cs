@@ -26,6 +26,37 @@ namespace RaceDay.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Category>()
+    .Property(c => c.DistanceKM)
+    .HasPrecision(10, 2);
+
+            modelBuilder.Entity<EventCategory>()
+                .Property(ec => ec.EntryFee)
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<RaceDay.Models.Route>()
+                .Property(r => r.DistanceKM)
+                .HasPrecision(10, 2);
+
+            modelBuilder.Entity<Weather>()
+                .Property(w => w.Temperature)
+                .HasPrecision(6, 2);
+
+            modelBuilder.Entity<Weather>()
+                .Property(w => w.FeelsLike)
+                .HasPrecision(6, 2);
+
+            modelBuilder.Entity<Weather>()
+                .Property(w => w.Humidity)
+                .HasPrecision(6, 2);
+
+            modelBuilder.Entity<Weather>()
+                .Property(w => w.WindSpeed)
+                .HasPrecision(6, 2);
+
+            modelBuilder.Entity<UserProfile>()
+                .HasKey(p => p.ProfileID);
+
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)

@@ -1,9 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\Data",
-    "\\docs"
+    "\\Services"
   ],
-  "SelectedNode": "\\docs\\api-endpoints.md",
+  "SelectedNode": "\\Services\\AuthService.cs",
   "PreviewInSolutionExplorer": false
 }

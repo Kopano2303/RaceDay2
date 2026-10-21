@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "8HaO9NIbkqM=",
+  "dgSpecHash": "KaHktHty5us=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay\\RaceDay.csproj",
+  "projectFilePath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay2\\RaceDay\\RaceDay.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Student\\.nuget\\packages\\azure.core\\1.41.0\\azure.core.1.41.0.nupkg.sha512",
     "C:\\Users\\Student\\.nuget\\packages\\azure.identity\\1.12.1\\azure.identity.1.12.1.nupkg.sha512",
@@ -92,9 +92,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "DM.Microsoft.EntityFrameworkCore 9.0.0.43760 depends on DM.DmProvider (>= 8.3.1.33719) but DM.DmProvider 8.3.1.33719 was not found. DM.DmProvider 8.3.1.36935 was resolved instead.",
-      "projectPath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay\\RaceDay.csproj",
+      "projectPath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay2\\RaceDay\\RaceDay.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay\\RaceDay.csproj",
+      "filePath": "C:\\Users\\Student\\Documents\\RaceDay\\RaceDay2\\RaceDay\\RaceDay.csproj",
       "libraryId": "DM.DmProvider",
       "targetGraphs": [
         "net9.0"
