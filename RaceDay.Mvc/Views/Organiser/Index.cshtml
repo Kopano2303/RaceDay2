@@ -1,0 +1,83 @@
+﻿@{
+    ViewData["Title"] = "Organiser Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Organiser Dashboard</h2>
+        <p class="text-muted">
+            Welcome back, @ViewBag.UserName!
+            Manage your RaceDay events and participants.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Event Management</h5>
+                    <p class="text-muted">
+                        Create, update and manage sporting events.
+                    </p>
+                    <a asp-controller="Organiser"
+                       asp-action="Events"
+                       class="btn btn-primary">
+                        Manage Events
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Categories</h5>
+                    <p class="text-muted">
+                        Organise events into different categories.
+                    </p>
+                    <a asp-controller="Organiser"
+                       asp-action="Categories"
+                       class="btn btn-primary">
+                        Manage Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Enrolments</h5>
+                    <p class="text-muted">
+                        View participants registered for your events.
+                    </p>
+                    <a asp-controller="Organiser"
+                       asp-action="Enrolments"
+                       class="btn btn-primary">
+                        View Enrolments
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold">Race Results</h5>
+                    <p class="text-muted">
+                        Manage and publish participant results.
+                    </p>
+                    <a asp-controller="Organiser"
+                       asp-action="Results"
+                       class="btn btn-primary">
+                        Manage Results
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
