@@ -1,0 +1,97 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EventViewModel>
+
+@{
+    ViewData["Title"] = "Discover Events";
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Discover RaceDay Events</h2>
+        <p class="text-muted">
+            Find your next running, walking or cycling challenge.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="alert alert-info">
+            No events are currently available.
+            Please check again later.
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var eventItem in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card shadow-sm border-0 h-100">
+
+                        <div class="card-body p-4">
+
+                            <span class="badge bg-primary mb-3">
+                                @eventItem.EventType
+                            </span>
+
+                            <h5 class="fw-bold">
+                                @eventItem.EventName
+                            </h5>
+
+                            <p class="text-muted">
+                                @eventItem.Description
+                            </p>
+
+                            <hr />
+
+                            <p class="mb-2">
+                                <strong>Date:</strong>
+                                @eventItem.EventDate.ToString("dd MMMM yyyy")
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Start time:</strong>
+                                @eventItem.StartTime.ToString(@"hh\:mm")
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Venue:</strong>
+                                @eventItem.Venue
+                            </p>
+
+                            <p class="mb-2">
+                                <strong>Location:</strong>
+                                @eventItem.City, @eventItem.Province
+                            </p>
+
+                            <p class="mb-3">
+                                <strong>Status:</strong>
+                                @eventItem.Status
+                            </p>
+
+                            <button class="btn btn-primary w-100"
+                                    disabled>
+                                Enrolment coming soon
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
