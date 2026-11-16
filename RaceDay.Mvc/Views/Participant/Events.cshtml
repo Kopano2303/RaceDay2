@@ -14,10 +14,31 @@
         </p>
     </div>
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     @if (ViewBag.ErrorMessage != null)
     {
         <div class="alert alert-danger">
             @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (ViewBag.CategoryErrorMessage != null)
+    {
+        <div class="alert alert-warning">
+            @ViewBag.CategoryErrorMessage
         </div>
     }
 
@@ -79,10 +100,55 @@
                                 @eventItem.Status
                             </p>
 
-                            <button class="btn btn-primary w-100"
-                                    disabled>
-                                Enrolment coming soon
-                            </button>
+                            <hr />
+
+                            <h6 class="fw-bold">Available Categories</h6>
+
+                            @if (eventItem.Categories == null ||
+                                                eventItem.Categories.Count == 0)
+                            {
+                                <p class="text-muted">
+                                    No categories have been added to this event yet.
+                                </p>
+                            }
+                            else
+                            {
+                                @foreach (var category in eventItem.Categories)
+                                {
+                                    <div class="border rounded p-3 mb-3">
+
+                                        <h6 class="fw-bold">
+                                            @category.CategoryName
+                                        </h6>
+
+                                        <p class="mb-1">
+                                            <strong>Entry fee:</strong>
+                                            R @category.EntryFee.ToString("N2")
+                                        </p>
+
+                                        <p class="mb-3">
+                                            <strong>Maximum participants:</strong>
+                                            @(category.MaximumParticipants?.ToString() ?? "Unlimited")
+                                        </p>
+
+                                        <form asp-controller="Participant"
+                                              asp-action="Enrol"
+                                              method="post">
+
+                                            <input type="hidden"
+                                                   name="eventCategoryId"
+                                                   value="@category.EventCategoryID" />
+
+                                            <button type="submit"
+                                                    class="btn btn-primary w-100">
+                                                Enrol Now
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+                                }
+                            }
 
                         </div>
 
@@ -95,3 +161,4 @@
     }
 
 </div>
+

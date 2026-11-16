@@ -1,0 +1,20 @@
+﻿
+namespace RaceDay.Mvc.ViewModels
+{
+    public class EventCategoryViewModel
+    {
+        public int EventCategoryID { get; set; }
+
+        public int EventID { get; set; }
+
+        public string EventName { get; set; } = string.Empty;
+
+        public int CategoryID { get; set; }
+
+        public string CategoryName { get; set; } = string.Empty;
+
+        public decimal EntryFee { get; set; }
+
+        public int? MaximumParticipants { get; set; }
+    }
+}

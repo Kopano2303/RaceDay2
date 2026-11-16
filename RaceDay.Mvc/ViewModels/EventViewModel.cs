@@ -35,5 +35,9 @@ namespace RaceDay.Mvc.ViewModels
 
         [Required]
         public string Status { get; set; } = string.Empty;
+
+        public List<EventCategoryViewModel> Categories { get; set; }
+            = new List<EventCategoryViewModel>();
     }
 }
+
