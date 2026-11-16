@@ -1,0 +1,154 @@
+﻿@model RaceDay.Mvc.ViewModels.CreateEventCategoryViewModel
+
+@{
+    ViewData["Title"] = "Link Category to Event";
+}
+
+<div class="container py-4">
+
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <div class="mb-4">
+                <h2 class="fw-bold">Link Category to Event</h2>
+                <p class="text-muted">
+                    Select an event and assign a race category.
+                </p>
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger">
+                            @ViewBag.ErrorMessage
+                        </div>
+                    }
+
+                    <form asp-controller="Organiser"
+                          asp-action="CreateEventCategory"
+                          method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EventID"
+                                   class="form-label">
+                                Select Event
+                            </label>
+
+                            <select asp-for="EventID"
+                                    class="form-select">
+
+                                <option value="0">
+                                    Select an event
+                                </option>
+
+                                @foreach (var eventItem in Model.Events)
+                                {
+                                    <option value="@eventItem.EventID">
+                                        @eventItem.EventName
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="EventID"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CategoryID"
+                                   class="form-label">
+                                Select Category
+                            </label>
+
+                            <select asp-for="CategoryID"
+                                    class="form-select">
+
+                                <option value="0">
+                                    Select a category
+                                </option>
+
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryID">
+                                        @category.CategoryName
+                                        (@category.DistanceKM km)
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="CategoryID"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="EntryFee"
+                                   class="form-label">
+                                Entry Fee (R)
+                            </label>
+
+                            <input asp-for="EntryFee"
+                                   type="number"
+                                   step="0.01"
+                                   min="0"
+                                   class="form-control"
+                                   placeholder="e.g. 150.00" />
+
+                            <span asp-validation-for="EntryFee"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="MaximumParticipants"
+                                   class="form-label">
+                                Maximum Participants
+                            </label>
+
+                            <input asp-for="MaximumParticipants"
+                                   type="number"
+                                   min="1"
+                                   class="form-control"
+                                   placeholder="Leave empty for unlimited" />
+
+                            <span asp-validation-for="MaximumParticipants"
+                                  class="text-danger"></span>
+
+                            <small class="text-muted">
+                                This field is optional.
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-controller="Organiser"
+                               asp-action="Categories"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Link Category
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

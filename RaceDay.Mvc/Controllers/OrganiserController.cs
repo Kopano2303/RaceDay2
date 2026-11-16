@@ -34,9 +34,7 @@ namespace RaceDay.Mvc.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
-                ViewBag.ErrorMessage =
-                    "Unable to load categories. Please try again.";
-
+                ViewBag.ErrorMessage = "Unable to load categories.";
                 return View(new List<CategoryViewModel>());
             }
 
@@ -44,6 +42,27 @@ namespace RaceDay.Mvc.Controllers
                 .ReadFromJsonAsync<List<CategoryViewModel>>();
 
             return View(categories ?? new List<CategoryViewModel>());
+        }
+
+        public async Task<IActionResult> EventCategories()
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/EventCategories",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage = "Unable to load event categories.";
+                return View(new List<EventCategoryViewModel>());
+            }
+
+            var eventCategories = await response.Content
+                .ReadFromJsonAsync<List<EventCategoryViewModel>>();
+
+            return View(eventCategories ?? new List<EventCategoryViewModel>());
         }
 
         [HttpGet]
@@ -54,8 +73,7 @@ namespace RaceDay.Mvc.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCategory(
-            CategoryViewModel model)
+        public async Task<IActionResult> CreateCategory(CategoryViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -78,21 +96,179 @@ namespace RaceDay.Mvc.Controllers
 
             if (response.IsSuccessStatusCode)
             {
-                TempData["SuccessMessage"] =
-                    "Category created successfully.";
-
+                TempData["SuccessMessage"] = "Category created successfully.";
                 return RedirectToAction("Categories");
             }
 
-            ViewBag.ErrorMessage =
-                "Unable to create category. Please check the information.";
-
+            ViewBag.ErrorMessage = "Unable to create category.";
             return View(model);
         }
 
-        public IActionResult Events()
+        [HttpGet]
+        public async Task<IActionResult> CreateEventCategory()
         {
-            return View();
+            var model = new CreateEventCategoryViewModel();
+            await LoadEventCategoryOptions(model);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateEventCategory(
+            CreateEventCategoryViewModel model)
+        {
+            if (model.EventID <= 0)
+            {
+                ModelState.AddModelError("EventID", "Please select an event.");
+            }
+
+            if (model.CategoryID <= 0)
+            {
+                ModelState.AddModelError("CategoryID", "Please select a category.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await LoadEventCategoryOptions(model);
+                return View(model);
+            }
+
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Post,
+                "api/EventCategories",
+                new
+                {
+                    model.EventID,
+                    model.CategoryID,
+                    model.EntryFee,
+                    model.MaximumParticipants
+                },
+                token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] =
+                    "Category successfully linked to the event.";
+
+                return RedirectToAction("EventCategories");
+            }
+
+            ViewBag.ErrorMessage = "Unable to link the category.";
+            await LoadEventCategoryOptions(model);
+            return View(model);
+        }
+
+        private async Task LoadEventCategoryOptions(
+            CreateEventCategoryViewModel model)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var eventResponse = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Events",
+                token: token);
+
+            if (eventResponse.IsSuccessStatusCode)
+            {
+                model.Events = await eventResponse.Content
+                    .ReadFromJsonAsync<List<EventViewModel>>()
+                    ?? new List<EventViewModel>();
+            }
+
+            var categoryResponse = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Categories",
+                token: token);
+
+            if (categoryResponse.IsSuccessStatusCode)
+            {
+                model.Categories = await categoryResponse.Content
+                    .ReadFromJsonAsync<List<CategoryViewModel>>()
+                    ?? new List<CategoryViewModel>();
+            }
+        }
+
+        public async Task<IActionResult> Events()
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Events",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage = "Unable to load events.";
+                return View(new List<EventViewModel>());
+            }
+
+            var events = await response.Content
+                .ReadFromJsonAsync<List<EventViewModel>>();
+
+            return View(events ?? new List<EventViewModel>());
+        }
+
+        [HttpGet]
+        public IActionResult CreateEvent()
+        {
+            return View(new EventViewModel
+            {
+                EventDate = DateTime.Today,
+                StartTime = TimeSpan.FromHours(8),
+                EventType = "Run",
+                Status = "Upcoming"
+            });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateEvent(EventViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string? token = HttpContext.Session.GetString("AuthToken");
+            string? userId = HttpContext.Session.GetString("UserID");
+
+            if (!int.TryParse(userId, out int organiserId))
+            {
+                ViewBag.ErrorMessage = "Unable to identify the logged-in organiser.";
+                return View(model);
+            }
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Post,
+                "api/Events",
+                new
+                {
+                    OrganiserID = organiserId,
+                    model.EventName,
+                    model.Description,
+                    model.EventType,
+                    model.EventDate,
+                    model.StartTime,
+                    model.Venue,
+                    model.City,
+                    model.Province,
+                    model.Status
+                },
+                token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Event created successfully.";
+                return RedirectToAction("Events");
+            }
+
+            ViewBag.ErrorMessage =
+                "Unable to create the event. Please check the information and try again.";
+
+            return View(model);
         }
 
         public IActionResult Enrolments()
@@ -106,3 +282,7 @@ namespace RaceDay.Mvc.Controllers
         }
     }
 }
+
+
+
+

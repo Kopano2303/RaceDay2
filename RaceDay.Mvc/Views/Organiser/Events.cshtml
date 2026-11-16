@@ -1,0 +1,113 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EventViewModel>
+
+@{
+    ViewData["Title"] = "Manage Events";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold">Manage Events</h2>
+            <p class="text-muted">
+                View and manage your road running, walking and cycling events.
+            </p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="CreateEvent"
+           class="btn btn-primary">
+            + Create Event
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h5>No events found</h5>
+
+                <p class="text-muted">
+                    There are currently no events available.
+                    Create an event to get started.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="CreateEvent"
+                   class="btn btn-primary">
+                    Create Your First Event
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Event Type</th>
+                            <th>Date</th>
+                            <th>Start Time</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var eventItem in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold">
+                                    @eventItem.EventName
+                                </td>
+
+                                <td>
+                                    @eventItem.EventType
+                                </td>
+
+                                <td>
+                                    @eventItem.EventDate.ToString("dd MMM yyyy")
+                                </td>
+
+                                <td>
+                                    @eventItem.StartTime
+                                </td>
+
+                                <td>
+                                    @eventItem.Venue, @eventItem.City
+                                </td>
+
+                                <td>
+                                    <span class="badge bg-primary">
+                                        @eventItem.Status
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    }
+
+</div>

@@ -2,11 +2,12 @@
 
 @{
     ViewData["Title"] = "Manage Categories";
+    Layout = "_Layout";
 }
 
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
         <div>
             <h2 class="fw-bold">Manage Categories</h2>
             <p class="text-muted">
@@ -14,11 +15,25 @@
             </p>
         </div>
 
-        <a asp-controller="Organiser"
-           asp-action="CreateCategory"
-           class="btn btn-primary">
-            + Create Category
-        </a>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-controller="Organiser"
+               asp-action="EventCategories"
+               class="btn btn-outline-secondary">
+                View Event Categories
+            </a>
+
+            <a asp-controller="Organiser"
+               asp-action="CreateEventCategory"
+               class="btn btn-outline-primary">
+                Link to Event
+            </a>
+
+            <a asp-controller="Organiser"
+               asp-action="CreateCategory"
+               class="btn btn-primary">
+                + Create Category
+            </a>
+        </div>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -40,9 +55,11 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body text-center py-5">
                 <h5>No categories found</h5>
+
                 <p class="text-muted">
                     Create your first category to get started.
                 </p>
+
                 <a asp-controller="Organiser"
                    asp-action="CreateCategory"
                    class="btn btn-primary">
@@ -72,14 +89,17 @@
                                 <td class="fw-semibold">
                                     @category.CategoryName
                                 </td>
+
                                 <td>
                                     @category.DistanceKM km
                                 </td>
+
                                 <td>
                                     <span class="badge bg-primary">
                                         @category.CategoryType
                                     </span>
                                 </td>
+
                                 <td>
                                     @(string.IsNullOrWhiteSpace(category.Description)
                                                                 ? "No description"
@@ -94,3 +114,4 @@
     }
 
 </div>
+

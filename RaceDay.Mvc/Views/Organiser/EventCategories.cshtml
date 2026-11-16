@@ -1,0 +1,118 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EventCategoryViewModel>
+
+@{
+    ViewData["Title"] = "Event Categories";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Event Categories</h2>
+            <p class="text-muted">
+                View categories assigned to your sporting events.
+            </p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Organiser"
+               asp-action="Categories"
+               class="btn btn-outline-secondary">
+                Back to Categories
+            </a>
+
+            <a asp-controller="Organiser"
+               asp-action="CreateEventCategory"
+               class="btn btn-primary">
+                + Link Category
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+
+                <h5>No event categories found</h5>
+
+                <p class="text-muted">
+                    You have not linked any categories to events yet.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="CreateEventCategory"
+                   class="btn btn-primary">
+                    Link First Category
+                </a>
+
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th>Event</th>
+                            <th>Category</th>
+                            <th>Entry Fee</th>
+                            <th>Maximum Participants</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+
+                                <td class="fw-semibold">
+                                    @item.EventName
+                                </td>
+
+                                <td>
+                                    @item.CategoryName
+                                </td>
+
+                                <td>
+                                    R @item.EntryFee.ToString("N2")
+                                </td>
+
+                                <td>
+                                    @(item.MaximumParticipants?.ToString() ?? "Unlimited")
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    }
+
+</div>
+
