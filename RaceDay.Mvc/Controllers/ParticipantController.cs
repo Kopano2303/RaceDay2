@@ -172,9 +172,126 @@ namespace RaceDay.Mvc.Controllers
             return View(results ?? new List<ResultViewModel>());
         }
 
-        public IActionResult Profile()
+        [HttpGet]
+        public async Task<IActionResult> Profile()
         {
-            return View();
+            string? token =
+                HttpContext.Session.GetString("AuthToken");
+
+            string? userId =
+                HttpContext.Session.GetString("UserID");
+
+            if (!int.TryParse(userId, out int id))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                $"api/Users/{id}/profile",
+                token: token);
+
+            if (response.StatusCode ==
+                System.Net.HttpStatusCode.NotFound)
+            {
+                return View(new ProfileViewModel
+                {
+                    UserID = id
+                });
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to load your profile. Please try again.";
+
+                return View(new ProfileViewModel
+                {
+                    UserID = id
+                });
+            }
+
+            var profile = await response.Content
+                .ReadFromJsonAsync<ProfileViewModel>();
+
+            if (profile == null)
+            {
+                ViewBag.ErrorMessage =
+                    "The API returned invalid profile information.";
+
+                return View(new ProfileViewModel
+                {
+                    UserID = id
+                });
+            }
+
+            return View(profile);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Profile(ProfileViewModel model)
+        {
+            string? token =
+                HttpContext.Session.GetString("AuthToken");
+
+            string? userId =
+                HttpContext.Session.GetString("UserID");
+
+            if (!int.TryParse(userId, out int id))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            model.UserID = id;
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Put,
+                $"api/Users/{id}/profile",
+                new
+                {
+                    model.DateOfBirth,
+                    model.Gender,
+                    model.EmergencyContactName,
+                    model.EmergencyContactPhone,
+                    model.ProfileImageUrl
+                },
+                token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] =
+                    "Your profile has been saved successfully.";
+
+                return RedirectToAction("Profile");
+            }
+
+            ViewBag.ErrorMessage =
+                "Unable to save your profile. Please try again.";
+
+            try
+            {
+                var error = await response.Content
+                    .ReadFromJsonAsync<JsonElement>();
+
+                if (error.TryGetProperty("message", out var message))
+                {
+                    ViewBag.ErrorMessage =
+                        message.GetString() ??
+                        ViewBag.ErrorMessage;
+                }
+            }
+            catch
+            {
+            }
+
+            return View(model);
         }
     }
 }
+
