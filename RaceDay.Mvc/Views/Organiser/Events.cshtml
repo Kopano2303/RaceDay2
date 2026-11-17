@@ -29,6 +29,13 @@
         </div>
     }
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     @if (ViewBag.ErrorMessage != null)
     {
         <div class="alert alert-danger">
@@ -69,6 +76,7 @@
                             <th>Start Time</th>
                             <th>Location</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
 
@@ -101,6 +109,15 @@
                                         @eventItem.Status
                                     </span>
                                 </td>
+
+                                <td>
+                                    <a asp-controller="Organiser"
+                                       asp-action="EditEvent"
+                                       asp-route-id="@eventItem.EventID"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Edit
+                                    </a>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -111,3 +128,4 @@
     }
 
 </div>
+

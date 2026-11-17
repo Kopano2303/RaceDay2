@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RaceDay.Mvc.Services;
 using RaceDay.Mvc.ViewModels;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace RaceDay.Mvc.Controllers
 {
@@ -237,7 +238,9 @@ namespace RaceDay.Mvc.Controllers
 
             if (!int.TryParse(userId, out int organiserId))
             {
-                ViewBag.ErrorMessage = "Unable to identify the logged-in organiser.";
+                ViewBag.ErrorMessage =
+                    "Unable to identify the logged-in organiser.";
+
                 return View(model);
             }
 
@@ -266,8 +269,103 @@ namespace RaceDay.Mvc.Controllers
             }
 
             ViewBag.ErrorMessage =
-                "Unable to create the event. Please check the information and try again.";
+                "Unable to create the event. Please check the information.";
 
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditEvent(int id)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                $"api/Events/{id}",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                TempData["ErrorMessage"] = "Unable to find the event.";
+                return RedirectToAction("Events");
+            }
+
+            var model = await response.Content
+                .ReadFromJsonAsync<EventViewModel>();
+
+            if (model == null)
+            {
+                TempData["ErrorMessage"] = "Unable to load event details.";
+                return RedirectToAction("Events");
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditEvent(
+            int id,
+            EventViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            string? userId = HttpContext.Session.GetString("UserID");
+
+            if (!int.TryParse(userId, out int organiserId))
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to identify the logged-in organiser.";
+
+                return View(model);
+            }
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Put,
+                $"api/Events/{id}",
+                new
+                {
+                    OrganiserID = organiserId,
+                    model.EventName,
+                    model.Description,
+                    model.EventType,
+                    model.EventDate,
+                    model.StartTime,
+                    model.Venue,
+                    model.City,
+                    model.Province,
+                    model.Status
+                },
+                token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Event updated successfully.";
+                return RedirectToAction("Events");
+            }
+
+            string errorMessage = "Unable to update the event.";
+
+            try
+            {
+                var error = await response.Content
+                    .ReadFromJsonAsync<JsonElement>();
+
+                if (error.TryGetProperty("message", out var message))
+                {
+                    errorMessage = message.GetString() ?? errorMessage;
+                }
+            }
+            catch
+            {
+            }
+
+            ViewBag.ErrorMessage = errorMessage;
             return View(model);
         }
 
