@@ -148,9 +148,28 @@ namespace RaceDay.Mvc.Controllers
             return View(enrolments ?? new List<EnrolmentViewModel>());
         }
 
-        public IActionResult MyResults()
+        public async Task<IActionResult> MyResults()
         {
-            return View();
+            string? token =
+                HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Results/my",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to load your race results. Please try again.";
+
+                return View(new List<ResultViewModel>());
+            }
+
+            var results = await response.Content
+                .ReadFromJsonAsync<List<ResultViewModel>>();
+
+            return View(results ?? new List<ResultViewModel>());
         }
 
         public IActionResult Profile()

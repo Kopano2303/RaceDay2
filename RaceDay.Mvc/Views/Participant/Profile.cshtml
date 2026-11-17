@@ -1,0 +1,123 @@
+﻿@model RaceDay.Mvc.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">My Profile</h2>
+        <p class="text-muted">
+            Manage your personal information and emergency contact details.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+
+            <form asp-controller="Participant"
+                  asp-action="Profile"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <input asp-for="UserID" type="hidden" />
+
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth</label>
+                    <input asp-for="DateOfBirth"
+                           type="date"
+                           class="form-control" />
+                    <span asp-validation-for="DateOfBirth"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Gender" class="form-label">
+                        Gender
+                    </label>
+
+                    <select asp-for="Gender" class="form-select">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                        <option value="Prefer not to say">
+                            Prefer not to say
+                        </option>
+                    </select>
+                </div>
+
+                <hr class="my-4" />
+
+                <h5 class="fw-bold mb-3">Emergency Contact</h5>
+
+                <div class="mb-3">
+                    <label asp-for="EmergencyContactName"
+                           class="form-label">
+                        Contact Name
+                    </label>
+
+                    <input asp-for="EmergencyContactName"
+                           class="form-control"
+                           placeholder="Enter emergency contact name" />
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmergencyContactPhone"
+                           class="form-label">
+                        Contact Phone Number
+                    </label>
+
+                    <input asp-for="EmergencyContactPhone"
+                           class="form-control"
+                           placeholder="Enter emergency contact number" />
+
+                    <span asp-validation-for="EmergencyContactPhone"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="ProfileImageUrl"
+                           class="form-label">
+                        Profile Image URL
+                    </label>
+
+                    <input asp-for="ProfileImageUrl"
+                           class="form-control"
+                           placeholder="Enter your profile image URL" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Save Profile
+                </button>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

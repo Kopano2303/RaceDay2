@@ -1,0 +1,101 @@
+﻿@model List<RaceDay.Mvc.ViewModels.ResultViewModel>
+
+@{
+    ViewData["Title"] = "My Race Results";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">My Race Results</h2>
+        <p class="text-muted">
+            Track your finishing times and positions across events.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No race results available</h5>
+                    <p class="text-muted">
+                        Your results will appear here once an organiser records them.
+                    </p>
+
+                    <a asp-controller="Participant"
+                       asp-action="Events"
+                       class="btn btn-primary">
+                        Browse Events
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event</th>
+                                <th>Category</th>
+                                <th>Finish Time</th>
+                                <th>Overall Position</th>
+                                <th>Category Position</th>
+                                <th>Status</th>
+                                <th>Recorded Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var result in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @result.EventName
+                                    </td>
+
+                                    <td>
+                                        @result.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @result.FinishTime
+                                    </td>
+
+                                    <td>
+                                        @(result.OverallPosition?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        @(result.CategoryPosition?.ToString() ?? "-")
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-success">
+                                            @result.Status
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @result.RecordedAt.ToString("dd MMM yyyy")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
