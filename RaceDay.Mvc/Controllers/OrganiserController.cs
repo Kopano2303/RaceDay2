@@ -369,6 +369,45 @@ namespace RaceDay.Mvc.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Delete,
+                $"api/Events/{id}",
+                token: token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] = "Event deleted successfully.";
+            }
+            else
+            {
+                string errorMessage = "Unable to delete the event.";
+
+                try
+                {
+                    var error = await response.Content
+                        .ReadFromJsonAsync<JsonElement>();
+
+                    if (error.TryGetProperty("message", out var message))
+                    {
+                        errorMessage = message.GetString() ?? errorMessage;
+                    }
+                }
+                catch
+                {
+                }
+
+                TempData["ErrorMessage"] = errorMessage;
+            }
+
+            return RedirectToAction("Events");
+        }
+
         public IActionResult Enrolments()
         {
             return View();
@@ -380,7 +419,4 @@ namespace RaceDay.Mvc.Controllers
         }
     }
 }
-
-
-
 

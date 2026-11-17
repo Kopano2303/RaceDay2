@@ -111,12 +111,31 @@
                                 </td>
 
                                 <td>
-                                    <a asp-controller="Organiser"
-                                       asp-action="EditEvent"
-                                       asp-route-id="@eventItem.EventID"
-                                       class="btn btn-sm btn-outline-primary">
-                                        Edit
-                                    </a>
+                                    <div class="d-flex gap-2">
+
+                                        <a asp-controller="Organiser"
+                                           asp-action="EditEvent"
+                                           asp-route-id="@eventItem.EventID"
+                                           class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+
+                                        <form asp-controller="Organiser"
+                                              asp-action="DeleteEvent"
+                                              asp-route-id="@eventItem.EventID"
+                                              method="post"
+                                              onsubmit="return confirm('Are you sure you want to delete this event? This action cannot be undone.');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -128,4 +147,5 @@
     }
 
 </div>
+
 
