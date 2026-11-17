@@ -314,7 +314,6 @@ namespace RaceDay.Mvc.Controllers
             }
 
             string? token = HttpContext.Session.GetString("AuthToken");
-
             string? userId = HttpContext.Session.GetString("UserID");
 
             if (!int.TryParse(userId, out int organiserId))
@@ -408,9 +407,25 @@ namespace RaceDay.Mvc.Controllers
             return RedirectToAction("Events");
         }
 
-        public IActionResult Enrolments()
+        public async Task<IActionResult> Enrolments()
         {
-            return View();
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Events",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage = "Unable to load events.";
+                return View(new List<EventViewModel>());
+            }
+
+            var events = await response.Content
+                .ReadFromJsonAsync<List<EventViewModel>>();
+
+            return View(events ?? new List<EventViewModel>());
         }
 
         public IActionResult Results()
