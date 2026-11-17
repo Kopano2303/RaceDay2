@@ -1,0 +1,99 @@
+﻿@model List<RaceDay.Mvc.ViewModels.ResultViewModel>
+
+@{
+    ViewData["Title"] = "Event Results";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <h2 class="fw-bold">Event Results</h2>
+            <p class="text-muted mb-0">
+                View recorded race results and add new results.
+            </p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="CreateResult"
+           asp-route-eventId="@ViewBag.EventID"
+           class="btn btn-primary">
+            Record New Result
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No results recorded yet</h5>
+                    <p class="text-muted">
+                        You can record the first result for this event.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Participant</th>
+                                <th>Category</th>
+                                <th>Finish Time</th>
+                                <th>Overall Position</th>
+                                <th>Category Position</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var result in Model)
+                            {
+                                <tr>
+                                    <td>@result.ParticipantName</td>
+                                    <td>@result.CategoryName</td>
+                                    <td>@result.FinishTime</td>
+                                    <td>
+                                        @(result.OverallPosition?.ToString() ?? "-")
+                                    </td>
+                                    <td>
+                                        @(result.CategoryPosition?.ToString() ?? "-")
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            @result.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <a asp-controller="Organiser"
+       asp-action="Results"
+       class="btn btn-outline-secondary mt-3">
+        Back to Events
+    </a>
+
+</div>

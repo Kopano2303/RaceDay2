@@ -1,0 +1,95 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EnrolmentViewModel>
+
+@{
+    ViewData["Title"] = "My Enrolments";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">My Enrolments</h2>
+        <p class="text-muted">
+            View the events and race categories you have entered.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>You have no enrolments yet</h5>
+                    <p class="text-muted">
+                        Explore available events and enrol in one to get started.
+                    </p>
+
+                    <a asp-controller="Participant"
+                       asp-action="Events"
+                       class="btn btn-primary">
+                        Browse Events
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Event</th>
+                                <th>Category</th>
+                                <th>Payment Status</th>
+                                <th>Enrolment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var enrolment in Model)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">
+                                        @enrolment.EventName
+                                    </td>
+
+                                    <td>
+                                        @enrolment.CategoryName
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-warning text-dark">
+                                            @enrolment.PaymentStatus
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-success">
+                                            @enrolment.EnrolmentStatus
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>

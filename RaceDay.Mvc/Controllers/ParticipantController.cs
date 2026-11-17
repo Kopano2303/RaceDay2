@@ -100,7 +100,8 @@ namespace RaceDay.Mvc.Controllers
             }
             else
             {
-                string errorMessage = "Unable to complete your enrolment.";
+                string errorMessage =
+                    "Unable to complete your enrolment.";
 
                 try
                 {
@@ -109,7 +110,8 @@ namespace RaceDay.Mvc.Controllers
 
                     if (error.TryGetProperty("message", out var message))
                     {
-                        errorMessage = message.GetString() ?? errorMessage;
+                        errorMessage =
+                            message.GetString() ?? errorMessage;
                     }
                 }
                 catch
@@ -122,9 +124,28 @@ namespace RaceDay.Mvc.Controllers
             return RedirectToAction("Events");
         }
 
-        public IActionResult MyEnrolments()
+        public async Task<IActionResult> MyEnrolments()
         {
-            return View();
+            string? token =
+                HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Enrolments/my",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to load your enrolments. Please try again.";
+
+                return View(new List<EnrolmentViewModel>());
+            }
+
+            var enrolments = await response.Content
+                .ReadFromJsonAsync<List<EnrolmentViewModel>>();
+
+            return View(enrolments ?? new List<EnrolmentViewModel>());
         }
 
         public IActionResult MyResults()
@@ -138,5 +159,3 @@ namespace RaceDay.Mvc.Controllers
         }
     }
 }
-
-
