@@ -455,10 +455,151 @@ namespace RaceDay.Mvc.Controllers
             return View(enrolments ?? new List<EnrolmentViewModel>());
         }
 
-        public IActionResult Results()
+        public async Task<IActionResult> Results()
         {
-            return View();
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                "api/Events",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage = "Unable to load events.";
+                return View(new List<EventViewModel>());
+            }
+
+            var events = await response.Content
+                .ReadFromJsonAsync<List<EventViewModel>>();
+
+            return View(events ?? new List<EventViewModel>());
+        }
+
+        public async Task<IActionResult> EventResults(int eventId)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                $"api/Results/event/{eventId}",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to load results for this event.";
+
+                ViewBag.EventID = eventId;
+
+                return View(new List<ResultViewModel>());
+            }
+
+            var results = await response.Content
+                .ReadFromJsonAsync<List<ResultViewModel>>();
+
+            ViewBag.EventID = eventId;
+
+            return View(results ?? new List<ResultViewModel>());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateResult(int eventId)
+        {
+            var model = new CreateResultViewModel();
+
+            await LoadResultEnrolments(model, eventId);
+
+            ViewBag.EventID = eventId;
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateResult(
+            int eventId,
+            CreateResultViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                await LoadResultEnrolments(model, eventId);
+                ViewBag.EventID = eventId;
+                return View(model);
+            }
+
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Post,
+                "api/Results",
+                new
+                {
+                    model.EnrolmentID,
+                    model.FinishTime,
+                    model.OverallPosition,
+                    model.CategoryPosition,
+                    model.Status
+                },
+                token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["SuccessMessage"] =
+                    "Race result recorded successfully.";
+
+                return RedirectToAction(
+                    "EventResults",
+                    new { eventId });
+            }
+
+            string errorMessage = "Unable to record the result.";
+
+            try
+            {
+                var error = await response.Content
+                    .ReadFromJsonAsync<JsonElement>();
+
+                if (error.TryGetProperty("message", out var message))
+                {
+                    errorMessage = message.GetString() ?? errorMessage;
+                }
+            }
+            catch
+            {
+            }
+
+            ViewBag.ErrorMessage = errorMessage;
+
+            await LoadResultEnrolments(model, eventId);
+            ViewBag.EventID = eventId;
+
+            return View(model);
+        }
+
+        private async Task LoadResultEnrolments(
+            CreateResultViewModel model,
+            int eventId)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                $"api/Enrolments/event/{eventId}",
+                token: token);
+
+            if (response.IsSuccessStatusCode)
+            {
+                model.Enrolments = await response.Content
+                    .ReadFromJsonAsync<List<EnrolmentViewModel>>()
+                    ?? new List<EnrolmentViewModel>();
+            }
+            else
+            {
+                model.Enrolments = new List<EnrolmentViewModel>();
+            }
         }
     }
 }
+
 
