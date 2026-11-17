@@ -428,6 +428,33 @@ namespace RaceDay.Mvc.Controllers
             return View(events ?? new List<EventViewModel>());
         }
 
+        public async Task<IActionResult> EventEnrolments(int eventId)
+        {
+            string? token = HttpContext.Session.GetString("AuthToken");
+
+            var response = await _apiService.SendAsync(
+                HttpMethod.Get,
+                $"api/Enrolments/event/{eventId}",
+                token: token);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                ViewBag.ErrorMessage =
+                    "Unable to load enrolments for this event.";
+
+                ViewBag.EventID = eventId;
+
+                return View(new List<EnrolmentViewModel>());
+            }
+
+            var enrolments = await response.Content
+                .ReadFromJsonAsync<List<EnrolmentViewModel>>();
+
+            ViewBag.EventID = eventId;
+
+            return View(enrolments ?? new List<EnrolmentViewModel>());
+        }
+
         public IActionResult Results()
         {
             return View();

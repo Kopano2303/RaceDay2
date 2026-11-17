@@ -1,0 +1,173 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EnrolmentViewModel>
+
+@{
+    ViewData["Title"] = "Event Enrolments";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+
+        <div>
+            <h2 class="fw-bold">Event Enrolments</h2>
+            <p class="text-muted">
+                View participants registered for this event.
+            </p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="Enrolments"
+           class="btn btn-outline-secondary">
+            Back to Events
+        </a>
+
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Total Enrolments</p>
+                    <h3 class="fw-bold">@Model.Count</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Confirmed Enrolments</p>
+                    <h3 class="fw-bold">
+                        @Model.Count(e => e.EnrolmentStatus == "Confirmed")
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <p class="text-muted mb-1">Pending Payments</p>
+                    <h3 class="fw-bold">
+                        @Model.Count(e => e.PaymentStatus == "Pending")
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            <h5 class="fw-bold mb-3">Registered Participants</h5>
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No enrolments found</h5>
+                    <p class="text-muted">
+                        No participants have enrolled in this event yet.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Enrolment ID</th>
+                                <th>Participant</th>
+                                <th>Participant ID</th>
+                                <th>Category</th>
+                                <th>Payment Status</th>
+                                <th>Enrolment Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var enrolment in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        #@enrolment.EnrolmentID
+                                    </td>
+
+                                    <td class="fw-semibold">
+                                        @enrolment.ParticipantName
+                                    </td>
+
+                                    <td>
+                                        @enrolment.UserID
+                                    </td>
+
+                                    <td>
+                                        @enrolment.CategoryName
+                                    </td>
+
+                                    <td>
+                                        @if (enrolment.PaymentStatus == "Paid")
+                                        {
+                                            <span class="badge bg-success">
+                                                Paid
+                                            </span>
+                                        }
+                                        else if (enrolment.PaymentStatus == "Pending")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @enrolment.PaymentStatus
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (enrolment.EnrolmentStatus == "Confirmed")
+                                        {
+                                            <span class="badge bg-success">
+                                                Confirmed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @enrolment.EnrolmentStatus
+                                            </span>
+                                        }
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

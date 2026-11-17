@@ -1,0 +1,94 @@
+﻿@model List<RaceDay.Mvc.ViewModels.EventViewModel>
+
+@{
+    ViewData["Title"] = "Manage Enrolments";
+    Layout = "_Layout";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h2 class="fw-bold">Manage Enrolments</h2>
+        <p class="text-muted">
+            Select one of your events to view its registered participants.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h5>No events available</h5>
+                <p class="text-muted">
+                    Create an event before managing its enrolments.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="CreateEvent"
+                   class="btn btn-primary">
+                    Create Event
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var eventItem in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card border-0 shadow-sm h-100">
+
+                        <div class="card-body">
+
+                            <span class="badge bg-primary mb-3">
+                                @eventItem.EventType
+                            </span>
+
+                            <h5 class="fw-bold">
+                                @eventItem.EventName
+                            </h5>
+
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-calendar-event"></i>
+                                @eventItem.EventDate.ToString("dd MMM yyyy")
+                            </p>
+
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-geo-alt"></i>
+                                @eventItem.Venue, @eventItem.City
+                            </p>
+
+                            <p class="text-muted mb-3">
+                                Status:
+                                <strong>@eventItem.Status</strong>
+                            </p>
+
+                            <a asp-controller="Organiser"
+                               asp-action="EventEnrolments"
+                               asp-route-eventId="@eventItem.EventID"
+                               class="btn btn-outline-primary w-100">
+                                View Participants
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
