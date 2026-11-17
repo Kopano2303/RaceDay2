@@ -3,81 +3,217 @@
     Layout = "_Layout";
 }
 
-<div class="container py-4">
+<div class="container py-5">
+
+    <div class="card border-0 shadow-sm mb-5"
+         style="background: linear-gradient(135deg, #212529, #495057); color: white;">
+
+        <div class="card-body p-5">
+
+            <span class="badge bg-warning text-dark mb-3">
+                Organiser Dashboard
+            </span>
+
+            <h2 class="fw-bold">
+                Welcome back, @ViewBag.UserName!
+            </h2>
+
+            <p class="mb-4">
+                Manage your RaceDay events, categories, participants
+                and race results from one central dashboard.
+            </p>
+
+            <a asp-controller="Organiser"
+               asp-action="CreateEvent"
+               class="btn btn-warning fw-bold">
+                Create New Event
+            </a>
+
+        </div>
+    </div>
 
     <div class="mb-4">
-        <h2 class="fw-bold">Organiser Dashboard</h2>
+        <h4 class="fw-bold mb-1">Management Centre</h4>
         <p class="text-muted">
-            Welcome back, @ViewBag.UserName!
-            Manage your RaceDay events and participants.
+            Select an area to manage your RaceDay operations.
         </p>
     </div>
 
     <div class="row g-4">
 
         <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-primary mb-3 align-self-start">
+                        Events
+                    </span>
+
                     <h5 class="fw-bold">Event Management</h5>
-                    <p class="text-muted">
-                        Create, update and manage sporting events.
+
+                    <p class="text-muted flex-grow-1">
+                        Create new sporting events, update event
+                        information and manage existing events.
                     </p>
+
                     <a asp-controller="Organiser"
                        asp-action="Events"
-                       class="btn btn-primary">
+                       class="btn btn-primary w-100">
                         Manage Events
                     </a>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold">Categories</h5>
-                    <p class="text-muted">
-                        Organise events into different categories.
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-success mb-3 align-self-start">
+                        Categories
+                    </span>
+
+                    <h5 class="fw-bold">Category Management</h5>
+
+                    <p class="text-muted flex-grow-1">
+                        Create and view categories for different
+                        sporting distances and event types.
                     </p>
+
                     <a asp-controller="Organiser"
                        asp-action="Categories"
-                       class="btn btn-primary">
+                       class="btn btn-success w-100">
                         Manage Categories
                     </a>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold">Enrolments</h5>
-                    <p class="text-muted">
-                        View participants registered for your events.
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-info text-dark mb-3 align-self-start">
+                        Event Setup
+                    </span>
+
+                    <h5 class="fw-bold">Event Categories</h5>
+
+                    <p class="text-muted flex-grow-1">
+                        Link categories to events and configure
+                        entry fees and participant limits.
                     </p>
+
+                    <a asp-controller="Organiser"
+                       asp-action="EventCategories"
+                       class="btn btn-info w-100">
+                        View Event Categories
+                    </a>
+
+                    <a asp-controller="Organiser"
+                       asp-action="CreateEventCategory"
+                       class="btn btn-outline-info w-100 mt-2">
+                        Add Event Category
+                    </a>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-warning text-dark mb-3 align-self-start">
+                        Participants
+                    </span>
+
+                    <h5 class="fw-bold">Enrolment Management</h5>
+
+                    <p class="text-muted flex-grow-1">
+                        View participant registrations and monitor
+                        enrolment and payment statuses.
+                    </p>
+
                     <a asp-controller="Organiser"
                        asp-action="Enrolments"
-                       class="btn btn-primary">
+                       class="btn btn-warning w-100">
                         View Enrolments
                     </a>
+
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-secondary mb-3 align-self-start">
+                        Results
+                    </span>
+
                     <h5 class="fw-bold">Race Results</h5>
-                    <p class="text-muted">
-                        Manage and publish participant results.
+
+                    <p class="text-muted flex-grow-1">
+                        View results recorded for your events and
+                        monitor participant performance.
                     </p>
+
                     <a asp-controller="Organiser"
                        asp-action="Results"
-                       class="btn btn-primary">
+                       class="btn btn-secondary w-100">
                         Manage Results
                     </a>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <span class="badge bg-danger mb-3 align-self-start">
+                        Recording
+                    </span>
+
+                    <h5 class="fw-bold">Record Race Results</h5>
+
+                    <p class="text-muted flex-grow-1">
+                        Record finishing times, overall positions
+                        and category positions for participants.
+                    </p>
+
+                    <a asp-controller="Organiser"
+                       asp-action="CreateResult"
+                       class="btn btn-danger w-100">
+                        Create Result
+                    </a>
+
                 </div>
             </div>
         </div>
 
     </div>
+
+    <div class="card border-0 shadow-sm mt-5">
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold">RaceDay Event Operations</h5>
+
+            <p class="text-muted mb-0">
+                Use the management centre to create events,
+                configure participation categories, monitor
+                registrations and record race results.
+                Keeping these activities organised helps deliver
+                a better experience for participants.
+            </p>
+
+        </div>
+    </div>
+
 </div>
+

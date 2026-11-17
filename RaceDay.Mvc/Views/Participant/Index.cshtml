@@ -3,81 +3,169 @@
     Layout = "_Layout";
 }
 
-<div class="container py-4">
+<div class="container py-5">
 
-    <div class="mb-4">
-        <h2 class="fw-bold">Welcome to RaceDay!</h2>
-        <p class="text-muted">
-            Hello, @ViewBag.UserName!
-            Discover events, manage your enrolments and track your results.
-        </p>
+    <div class="card border-0 shadow-sm mb-5"
+         style="background: linear-gradient(135deg, #0d6efd, #084298); color: white;">
+
+        <div class="card-body p-5">
+
+            <span class="badge bg-light text-primary mb-3">
+                Participant Dashboard
+            </span>
+
+            <h2 class="fw-bold">
+                Welcome to RaceDay, @ViewBag.UserName!
+            </h2>
+
+            <p class="mb-4">
+                Your next challenge starts here. Discover events,
+                manage your enrolments and follow your race achievements.
+            </p>
+
+            <a asp-controller="Participant"
+               asp-action="Events"
+               class="btn btn-light text-primary fw-bold">
+                Discover Events
+            </a>
+
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-1">Your RaceDay Activities</h4>
+            <p class="text-muted mb-0">
+                Manage your participation from one place.
+            </p>
+        </div>
     </div>
 
     <div class="row g-4">
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <div class="mb-3">
+                        <span class="badge bg-primary p-2">
+                            Events
+                        </span>
+                    </div>
+
                     <h5 class="fw-bold">Discover Events</h5>
-                    <p class="text-muted">
-                        Explore upcoming running, walking and cycling events.
+
+                    <p class="text-muted flex-grow-1">
+                        Browse available running, walking and cycling
+                        events and find your next challenge.
                     </p>
+
                     <a asp-controller="Participant"
                        asp-action="Events"
-                       class="btn btn-primary">
+                       class="btn btn-primary w-100">
                         Browse Events
                     </a>
+
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <div class="mb-3">
+                        <span class="badge bg-success p-2">
+                            Enrolments
+                        </span>
+                    </div>
+
                     <h5 class="fw-bold">My Enrolments</h5>
-                    <p class="text-muted">
-                        View the events you have registered for.
+
+                    <p class="text-muted flex-grow-1">
+                        Review your event registrations and check
+                        your enrolment and payment statuses.
                     </p>
+
                     <a asp-controller="Participant"
                        asp-action="MyEnrolments"
-                       class="btn btn-primary">
+                       class="btn btn-success w-100">
                         View Enrolments
                     </a>
+
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <div class="mb-3">
+                        <span class="badge bg-warning text-dark p-2">
+                            Performance
+                        </span>
+                    </div>
+
                     <h5 class="fw-bold">My Results</h5>
-                    <p class="text-muted">
-                        Track your performance and race achievements.
+
+                    <p class="text-muted flex-grow-1">
+                        View your recorded race results, finishing
+                        times and positions.
                     </p>
+
                     <a asp-controller="Participant"
                        asp-action="MyResults"
-                       class="btn btn-primary">
+                       class="btn btn-warning w-100">
                         View Results
                     </a>
+
                 </div>
             </div>
         </div>
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4 d-flex flex-column">
+
+                    <div class="mb-3">
+                        <span class="badge bg-secondary p-2">
+                            Account
+                        </span>
+                    </div>
+
                     <h5 class="fw-bold">My Profile</h5>
-                    <p class="text-muted">
-                        Update your personal information and profile picture.
+
+                    <p class="text-muted flex-grow-1">
+                        Manage your personal details, emergency
+                        contact information and profile picture.
                     </p>
+
                     <a asp-controller="Participant"
                        asp-action="Profile"
-                       class="btn btn-primary">
+                       class="btn btn-secondary w-100">
                         Manage Profile
                     </a>
+
                 </div>
             </div>
         </div>
 
     </div>
+
+    <div class="card border-0 shadow-sm mt-5">
+        <div class="card-body p-4">
+
+            <h5 class="fw-bold">Your RaceDay Journey</h5>
+
+            <p class="text-muted mb-0">
+                Find an event that interests you, enrol in a category,
+                participate in the race and track your results.
+                RaceDay helps you manage your journey from registration
+                to the finish line.
+            </p>
+
+        </div>
+    </div>
+
 </div>

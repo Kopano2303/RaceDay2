@@ -51,61 +51,141 @@
     }
     else
     {
-        <div class="row g-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+
+                <h5 class="fw-bold mb-3">Find an Event</h5>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label for="eventSearch" class="form-label">
+                            Search events
+                        </label>
+
+                        <input type="text"
+                               id="eventSearch"
+                               class="form-control"
+                               placeholder="Search by event name, venue or city..." />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="eventTypeFilter" class="form-label">
+                            Event type
+                        </label>
+
+                        <select id="eventTypeFilter" class="form-select">
+                            <option value="">All event types</option>
+                            <option value="running">Running</option>
+                            <option value="walking">Walking</option>
+                            <option value="cycling">Cycling</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="button"
+                                id="clearFilters"
+                                class="btn btn-outline-secondary w-100">
+                            Clear Filters
+                        </button>
+                    </div>
+
+                </div>
+
+                <div class="mt-3 text-muted">
+                    <span id="eventCount">@Model.Count</span> event(s) found
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row g-4" id="eventList">
 
             @foreach (var eventItem in Model)
             {
-                <div class="col-md-6 col-lg-4">
+                <div class="col-md-6 col-lg-4 event-card"
+                     data-name="@eventItem.EventName.ToLower()"
+                     data-venue="@eventItem.Venue.ToLower()"
+                     data-city="@eventItem.City.ToLower()"
+                     data-type="@eventItem.EventType.ToLower()">
 
                     <div class="card shadow-sm border-0 h-100">
 
-                        <div class="card-body p-4">
+                        <div class="card-body p-4 d-flex flex-column">
 
-                            <span class="badge bg-primary mb-3">
-                                @eventItem.EventType
-                            </span>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
 
-                            <h5 class="fw-bold">
-                                @eventItem.EventName
-                            </h5>
+                                <span class="badge bg-primary">
+                                    @eventItem.EventType
+                                </span>
 
-                            <p class="text-muted">
-                                @eventItem.Description
-                            </p>
+                                @if (eventItem.Status.Equals("Open", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-success">Open</span>
+                                }
+                                else if (eventItem.Status.Equals("Upcoming", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-info text-dark">Upcoming</span>
+                                }
+                                else if (eventItem.Status.Equals("Closed", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-secondary">Closed</span>
+                                }
+                                else if (eventItem.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <span class="badge bg-danger">Cancelled</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @eventItem.Status
+                                    </span>
+                                }
+
+                        </div>
+
+                        <h5 class="fw-bold">
+                            @eventItem.EventName
+                        </h5>
+
+                        <p class="text-muted">
+                            @(string.IsNullOrWhiteSpace(eventItem.Description)
+                                                    ? "Join this RaceDay event and take on a new challenge."
+                                                    : eventItem.Description)
+                    </p>
 
                             <hr />
 
-                            <p class="mb-2">
-                                <strong>Date:</strong>
-                                @eventItem.EventDate.ToString("dd MMMM yyyy")
-                            </p>
+                            <div class="mb-3">
 
-                            <p class="mb-2">
-                                <strong>Start time:</strong>
-                                @eventItem.StartTime.ToString(@"hh\:mm")
-                            </p>
+                                <p class="mb-2">
+                                    <strong>Date:</strong>
+                                    @eventItem.EventDate.ToString("dd MMMM yyyy")
+                                </p>
 
-                            <p class="mb-2">
-                                <strong>Venue:</strong>
-                                @eventItem.Venue
-                            </p>
+                                <p class="mb-2">
+                                    <strong>Start time:</strong>
+                                    @eventItem.StartTime.ToString(@"hh\:mm")
+                                </p>
 
-                            <p class="mb-2">
-                                <strong>Location:</strong>
-                                @eventItem.City, @eventItem.Province
-                            </p>
+                                <p class="mb-2">
+                                    <strong>Venue:</strong>
+                                    @eventItem.Venue
+                                </p>
 
-                            <p class="mb-3">
-                                <strong>Status:</strong>
-                                @eventItem.Status
-                            </p>
+                                <p class="mb-2">
+                                    <strong>Location:</strong>
+                                    @eventItem.City, @eventItem.Province
+                                </p>
+
+                            </div>
 
                             <hr />
 
-                            <h6 class="fw-bold">Available Categories</h6>
+                            <h6 class="fw-bold mb-3">Available Categories</h6>
 
-                            @if (eventItem.Categories == null ||
-                                                eventItem.Categories.Count == 0)
+                    @if (eventItem.Categories == null ||
+                                        eventItem.Categories.Count == 0)
                             {
                                 <p class="text-muted">
                                     No categories have been added to this event yet.
@@ -131,20 +211,33 @@
                                             @(category.MaximumParticipants?.ToString() ?? "Unlimited")
                                         </p>
 
-                                        <form asp-controller="Participant"
-                                              asp-action="Enrol"
-                                              method="post">
+                                        @if (eventItem.Status.Equals("Open", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <form asp-controller="Participant"
+                                                  asp-action="Enrol"
+                                                  method="post">
 
-                                            <input type="hidden"
-                                                   name="eventCategoryId"
-                                                   value="@category.EventCategoryID" />
+                                                @Html.AntiForgeryToken()
 
-                                            <button type="submit"
-                                                    class="btn btn-primary w-100">
-                                                Enrol Now
+                                                <input type="hidden"
+                                                       name="eventCategoryId"
+                                                       value="@category.EventCategoryID" />
+
+                                                <button type="submit"
+                                                        class="btn btn-primary w-100">
+                                                    Enrol Now
+                                                </button>
+
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button type="button"
+                                                    class="btn btn-secondary w-100"
+                                                    disabled>
+                                                Enrolment Unavailable
                                             </button>
-
-                                        </form>
+                                        }
 
                                     </div>
                                 }
@@ -158,7 +251,75 @@
             }
 
         </div>
+
+        <div id="noEventsFound"
+             class="alert alert-info text-center mt-4"
+             style="display: none;">
+            No events match your search. Try changing your filters.
+        </div>
     }
 
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const searchInput = document.getElementById("eventSearch");
+            const typeFilter = document.getElementById("eventTypeFilter");
+            const clearButton = document.getElementById("clearFilters");
+            const eventCards = document.querySelectorAll(".event-card");
+            const eventCount = document.getElementById("eventCount");
+            const noEventsFound = document.getElementById("noEventsFound");
+
+            function filterEvents() {
+
+                const searchValue = searchInput.value.toLowerCase().trim();
+                const selectedType = typeFilter.value.toLowerCase();
+
+                let visibleCount = 0;
+
+                eventCards.forEach(function (card) {
+
+                    const name = card.dataset.name;
+                    const venue = card.dataset.venue;
+                    const city = card.dataset.city;
+                    const type = card.dataset.type;
+
+                    const matchesSearch =
+                        name.includes(searchValue) ||
+                        venue.includes(searchValue) ||
+                        city.includes(searchValue);
+
+                    const matchesType =
+                        selectedType === "" ||
+                        type.includes(selectedType);
+
+                    if (matchesSearch && matchesType) {
+                        card.style.display = "";
+                        visibleCount++;
+                    } else {
+                        card.style.display = "none";
+                    }
+
+                });
+
+                eventCount.textContent = visibleCount;
+
+                noEventsFound.style.display =
+                    visibleCount === 0 ? "block" : "none";
+            }
+
+            searchInput.addEventListener("input", filterEvents);
+            typeFilter.addEventListener("change", filterEvents);
+
+            clearButton.addEventListener("click", function () {
+                searchInput.value = "";
+                typeFilter.value = "";
+                filterEvents();
+            });
+
+        });
+    </script>
+}
 
